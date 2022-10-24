@@ -5,3 +5,5 @@ python-dotenv==0.20.0
 PyQt5==5.15.7
 plotly==5.9.0
 pandas==1.4.2
+PyQtChart==5.15.6
+pandas==1.4.2
