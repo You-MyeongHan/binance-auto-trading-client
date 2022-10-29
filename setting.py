@@ -1,11 +1,10 @@
 import sys
 import time
-import pybithumb
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QTableWidgetItem, QProgressBar
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QPropertyAnimation
-
+from binance.client import Client
 
 
 class SettingWorker(QThread):
@@ -32,6 +31,13 @@ class SettingWidget(QWidget):
         self.longButton.clicked.connect(self.clickLongButton)
         self.shortButton.clicked.connect(self.clickShortButton)
 
+        with open("config.txt") as f:
+            lines = f.readlines()
+            self.apikey = lines[0].strip()
+            self.seckey = lines[1].strip()
+
+        self.client=Client(api_key=self.apikey, api_secret=self.seckey)
+
         self.sw = SettingWorker(self.ticker)
         self.sw.start()
 
@@ -48,16 +54,22 @@ class SettingWidget(QWidget):
         print("predict")
 
     def clickBuyButton(self):
-        print("buy "+ self.ticker)
+        order=self.client.order_market_buy(
+            symbol=self.ticker,
+
+        )
     
     def clickSellButton(self):
-        print("sell" + self.ticker)
+        sw.clickBuyButton(self.ticker)
 
     def clickLongButton(self):
         print("set long postion")
     
     def clickShortButton(self):
         print("set short position")
+
+    def checkBalance(self):
+        pass
 
 if __name__ == "__main__":
     import sys

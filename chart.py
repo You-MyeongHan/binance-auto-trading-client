@@ -8,14 +8,14 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QLineSeries, QChart, QValueAxis, QDateTimeAxis, QCandlestickSeries,QCandlestickSet, QChartView
-from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtCore import Qt, QDateTime, QObject
 from PyQt5.QtCore import *
 from pandas.core import frame
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
 class ChartWorker(QThread):
-    dataSent = pyqtSignal(frame.DataFrame)
+    dataSent = pyqtSignal(float,float,float,float)
     
     def __init__(self):
         super().__init__()
@@ -27,17 +27,17 @@ class ChartWorker(QThread):
         #     seckey = lines[1].strip()
             self.ticker = lines[2].strip()
             self.dataLen = int(lines[3].strip())
+        self.binance = ccxt.binance()
 
     def run(self):
         while self.alive:
-            time.sleep(300) #5minutes
-            data=self.binance.fetch_ohlcv(self.ticker, '5m', limit=1)
-            df = pd.DataFrame(data, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
-            df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
-            df.set_index('datetime', inplace=True)
-
-            if df != None:
-                self.dataSent.emit(df)
+            df = self.binance.fetch_ticker("BTC/USDT")
+            self.dataSent.emit(df['open'],df['high'],df['low'],df['close'])
+            time.sleep(5) #5minutes
+            # data=self.binance.fetch_ohlcv(self.ticker, '5m', limit=1)
+            # df = pd.DataFrame(data, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
+            # df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
+            # df.set_index('datetime', inplace=True)
 
     def close(self):
         self.alive = False
@@ -55,7 +55,7 @@ class ChartWidget(QWidget):
         self.cw.start()
 
         self.minute_cur = QDateTime.currentDateTime()   # current
-        self.minute_pre = self.minute_cur.addSecs(-self.dataLen*5*60)  # 1 minute ago
+        self.minute_pre = self.minute_cur.addSecs(-300)  # 5 minute ago
         self.ticks = pd.Series(dtype='float64') 
 
         self.series = QCandlestickSeries()
@@ -84,8 +84,7 @@ class ChartWidget(QWidget):
         
         self.chart = QChart()
         self.chart.legend().hide()
-        self.chart.addSeries(self.series)
-        
+        self.chart.addSeries(self.series)        
 
         axis_x = QDateTimeAxis()
         axis_x.setFormat("hh:mm:ss")
@@ -96,25 +95,27 @@ class ChartWidget(QWidget):
         axis_y.setLabelFormat("%i")
         self.chart.addAxis(axis_y, Qt.AlignLeft)
         self.series.attachAxis(axis_y)
-        # axis_x.setTickCount(10) #
+        
+        chart_view = QChartView(self.chart)
+        #self.chartView.setChart(self.chart)
+        chart_view.setRenderHint(QPainter.Antialiasing)
+        
 
-        print(open)
-        print("check point1")
-
-        self.chartView.setChart(self.chart)
-        self.chartView.setRenderHint(QPainter.Antialiasing)
         
 #===========================================================================
 
-    @pyqtSlot(frame.DataFrame)
+    @pyqtSlot(float)
     def appendData(self, currPrice):
+        # if len(self.series) == self.dataLen :
+        #     self.series.remove()
         dt = QDateTime.currentDateTime()
-        self.statusBar().showMessage(dt.toString())
         self.ticks[dt] = currPrice
 
         # check whether minute changed
         #if dt.time().minute() != self.minute_cur.time().minute():
 
+        ts = dt.toMSecsSinceEpoch()
+        print(ts, currPrice)
 
         sets = self.series.sets()
         last_set = sets[-1]                  

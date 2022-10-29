@@ -16,7 +16,7 @@ df = pd.DataFrame(ohlcv, columns=['datetime', 'open', 'high', 'low', 'close', 'v
 df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
 df.set_index('datetime', inplace=True)
 
-print(df)
+
 
 class PositionalEncoding(nn.Module):
 
