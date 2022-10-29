@@ -107,7 +107,7 @@ color: #D8D8D8; border-style: solid; border-width: 1px; border-color: #D8D8D8; b
      </layout>
     </item>
     <item row="0" column="0">
-     <widget class="ChartWidget" name="chart_widget" native="true">
+     <widget class="QChartView" name="chart_widget" native="true">
       <property name="minimumSize">
        <size>
         <width>1500</width>
@@ -121,6 +121,12 @@ color: #D8D8D8; border-style: solid; border-width: 1px; border-color: #D8D8D8; b
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QChartView</class>
+   <extends>QWidget</extends>
+   <header>PyQt5.QtChart</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>SettingWidget</class>
    <extends>QWidget</extends>
    <header>setting</header>
@@ -130,12 +136,6 @@ color: #D8D8D8; border-style: solid; border-width: 1px; border-color: #D8D8D8; b
    <class>LogWidget</class>
    <extends>QTextEdit</extends>
    <header>log</header>
-  </customwidget>
-  <customwidget>
-   <class>ChartWidget</class>
-   <extends>QWidget</extends>
-   <header>chart</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

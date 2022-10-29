@@ -5,7 +5,7 @@ import ccxt
 import pandas as pd 
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget,QVBoxLayout
 from PyQt5.QtGui import QPainter
 from PyQt5.QtChart import QLineSeries, QChart, QValueAxis, QDateTimeAxis, QCandlestickSeries,QCandlestickSet, QChartView
 from PyQt5.QtCore import Qt, QDateTime, QObject
@@ -23,8 +23,6 @@ class ChartWorker(QThread):
 
         with open("config.txt") as f:
             lines = f.readlines()
-        #     apikey = lines[0].strip()
-        #     seckey = lines[1].strip()
             self.ticker = lines[2].strip()
             self.dataLen = int(lines[3].strip())
         self.binance = ccxt.binance()
@@ -60,7 +58,7 @@ class ChartWidget(QWidget):
 
         self.series = QCandlestickSeries()
         self.series.setIncreasingColor(Qt.red)
-        self.series.setDecreasingColor(Qt.blue)    
+        self.series.setDecreasingColor(Qt.blue)
 
         self.binance=ccxt.binance()
         self.ohlcv = self.binance.fetch_ohlcv(self.ticker, '5m', limit=self.dataLen)
@@ -82,40 +80,40 @@ class ChartWidget(QWidget):
             elem = QCandlestickSet(open, high, low, close, ts)
             self.series.append(elem)
         
-        self.chart = QChart()
-        self.chart.legend().hide()
-        self.chart.addSeries(self.series)        
+        chart = QChart()
+        chart.legend().hide()
+        chart.addSeries(self.series)        
 
         axis_x = QDateTimeAxis()
         axis_x.setFormat("hh:mm:ss")
-        self.chart.addAxis(axis_x, Qt.AlignBottom)
+        chart.addAxis(axis_x, Qt.AlignBottom)
         self.series.attachAxis(axis_x)
 
         axis_y = QValueAxis()
         axis_y.setLabelFormat("%i")
-        self.chart.addAxis(axis_y, Qt.AlignLeft)
+        chart.addAxis(axis_y, Qt.AlignLeft)
         self.series.attachAxis(axis_y)
         
-        chart_view = QChartView(self.chart)
-        #self.chartView.setChart(self.chart)
+        chart_view = QChartView(chart)
+        layout =QVBoxLayout(chart_view)
+        self.chartView.setChart(chart)
         chart_view.setRenderHint(QPainter.Antialiasing)
+        layout.addWidget()
         
 
         
 #===========================================================================
 
     @pyqtSlot(float)
-    def appendData(self, currPrice):
+    def appendData(self):
         # if len(self.series) == self.dataLen :
         #     self.series.remove()
         dt = QDateTime.currentDateTime()
-        self.ticks[dt] = currPrice
 
         # check whether minute changed
         #if dt.time().minute() != self.minute_cur.time().minute():
 
-        ts = dt.toMSecsSinceEpoch()
-        print(ts, currPrice)
+        # ts = dt.toMSecsSinceEpoch()
 
         sets = self.series.sets()
         last_set = sets[-1]                  

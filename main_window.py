@@ -2,29 +2,52 @@ import sys
 import os
 #sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QThread, pyqtSignal
 from binance.client import Client
 import datetime
-
-form_class = uic.loadUiType("ui_resource/main_window.ui")[0]
+from functools import partial
+form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
 
 class MainWindow(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("binance auto trading")
+        
+        self.init_ui()
 
-        with open("config.txt") as f:
-            lines = f.readlines()
-            apikey = lines[0].strip()
-            seckey = lines[1].strip()
-            self.ticker = lines[1].strip()
-
-    def closeEvent(self, event):
-        self.chart_widget.closeEvent(event)
-        self.widget_2.closeEvent(event)
-        self.widget_3.closeEvent(event)
+    def init_ui(self):
+        self.start_btn.clicked.connect(self.start)
+        self.stop_btn.clicked.connect(self.stop)
+        self.prediction_chart_btn.clicked.connect(self.predictChart)
+        self.balance_chart_btn.clicked.connect(self.balanceChart)
+        self.log_btn.clicked.connect(self.log)
+        self.setting_btn.clicked.connect(self.setting)
+    
+    def start(self):
+        print("start")
+    
+    def stop(self):
+        print("stop")
+        
+    def predictChart(self):
+        print("predictChart")
+        
+    def balanceChart(self):
+        print("balanceChart")
+        
+    def log(self):
+        print("log")
+        
+    def setting(self):
+        print("setting")
+    
+    def close(self, event):
+        self.alive = False
+        
+    
+    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -7,3 +7,5 @@ plotly==5.9.0
 pandas==1.4.2
 PyQtChart==5.15.6
 pandas==1.4.2
+PySide2==5.15.2.1
+QT-PyQt-PySide-Custom-Widgets

@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>minus.svg</file>
+    <file>x.svg</file>
+    <file>maximize-2.svg</file>
+    <file>align-justify.svg</file>
+    <file>file-text.svg</file>
+    <file>arrow-down-right.svg</file>
+    <file>dollar-sign.svg</file>
+    <file>list.svg</file>
+    <file>percent.svg</file>
+    <file>play.svg</file>
+    <file>tool.svg</file>
+    <file>stop-circle.svg</file>
+    <file>power.svg</file>
+    <file>settings.svg</file>
+  </qresource>
+</RCC>
