@@ -1,6 +1,5 @@
 import sys
 import time
-import pybithumb
 from PyQt5 import uic
 from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QTableWidgetItem, QProgressBar
