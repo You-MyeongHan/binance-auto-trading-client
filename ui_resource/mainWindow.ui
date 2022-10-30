@@ -839,7 +839,7 @@ border-style: solid;
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
                 </property>
-                <layout class="QGridLayout" name="prediction_chart_cont_2"/>
+                <layout class="QGridLayout" name="line_chart_conf"/>
                </widget>
               </item>
              </layout>

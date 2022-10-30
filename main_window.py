@@ -8,9 +8,10 @@ import csv
 import pandas as pd
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication
-from PyQt5.QtChart import QChart,QDateTimeAxis,QCandlestickSet,QValueAxis,QCandlestickSeries,QChartView
-from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread
+from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
+from PyQt5.QtChart import QChart,QDateTimeAxis,QCandlestickSet,QValueAxis,\
+    QCandlestickSeries,QChartView,QLineSeries
+from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QSize
 from PyQt5.QtGui import QPainter
 from binance.client import Client
 from functools import partial
@@ -92,7 +93,35 @@ class MainWindow(QMainWindow, form_class):
         self.show()
     
     def lineChart(self):
-        pass
+        self.series1=QLineSeries()
+        
+        rowCount=0
+        df=self.fetch_coin_data(500)
+        for index in df.index:
+            if rowCount>0:
+                self.series1.append(float(rowCount), df.loc[index, 'close'])
+            
+            rowCount+=1
+        
+        self.chart=QChart()
+        self.chart.legend().hide()
+        self.chart.addSeries(self.series1)
+        self.chart.createDefaultAxes()
+        self.chart.setTitle("BTC/USDT")
+        
+        self.chartView=QChartView(self.chart)
+        self.chartView.setRenderHint(QPainter.Antialiasing)
+        self.chart.setAnimationOptions(QChart.AllAnimations)
+        self.chartView.chart().setTheme(QChart.ChartThemeDark)
+        
+        sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
+        self.chartView.setSizePolicy(sizePolicy)
+        self.chartView.setMinimumSize(QSize(0,300))
+        
+        self.line_chart_conf.addWidget(self.chartView)
+        self.frame_20.setStyleSheet(u"background-color: transparent;")
+        
     
     def balanceChart(self):
         print("balanceChart")
