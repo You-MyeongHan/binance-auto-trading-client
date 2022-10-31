@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>892</width>
-    <height>580</height>
+    <width>1233</width>
+    <height>742</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -287,6 +287,9 @@ border-style: solid;
 }</string>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QWidget" name="left_menu_widget" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -649,7 +652,7 @@ border-style: solid;
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
-              <widget class="QPushButton" name="minimize_window_button">
+              <widget class="QPushButton" name="minimize_window_btn">
                <property name="minimumSize">
                 <size>
                  <width>30</width>
@@ -672,7 +675,7 @@ border-style: solid;
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="maximize_window_button">
+              <widget class="QPushButton" name="maximize_window_btn">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -701,7 +704,7 @@ border-style: solid;
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="close_window_button">
+              <widget class="QPushButton" name="close_window_btn">
                <property name="minimumSize">
                 <size>
                  <width>30</width>
@@ -760,6 +763,21 @@ border-style: solid;
             </property>
             <widget class="QWidget" name="prediction_chart">
              <layout class="QVBoxLayout" name="verticalLayout_5">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item alignment="Qt::AlignTop">
                <widget class="QFrame" name="frame_15">
                 <property name="frameShape">
@@ -803,6 +821,21 @@ border-style: solid;
             </widget>
             <widget class="QWidget" name="line_chart">
              <layout class="QVBoxLayout" name="verticalLayout_13">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QFrame" name="frame_21">
                 <property name="frameShape">
@@ -846,6 +879,21 @@ border-style: solid;
             </widget>
             <widget class="QWidget" name="balance_chart">
              <layout class="QVBoxLayout" name="verticalLayout_8">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QFrame" name="frame_18">
                 <property name="frameShape">
@@ -882,7 +930,7 @@ border-style: solid;
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_2"/>
+                <layout class="QGridLayout" name="balance_chart_conf"/>
                </widget>
               </item>
              </layout>
@@ -915,7 +963,7 @@ border-style: solid;
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_10">
+                <layout class="QVBoxLayout" name="log_conf">
                  <property name="spacing">
                   <number>0</number>
                  </property>
@@ -932,7 +980,15 @@ border-style: solid;
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QTextEdit" name="textEdit"/>
+                  <widget class="QTextEdit" name="textEdit">
+                   <property name="html">
+                    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'bahnschrift Semibold'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -989,6 +1045,7 @@ border-style: solid;
  </widget>
  <resources>
   <include location="../icon/resources.qrc"/>
+  <include location="../../../../.designer/icon/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
