@@ -11,7 +11,7 @@ import asyncio
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
 from PyQt5.QtChart import QChart,QDateTimeAxis,QCandlestickSet,QValueAxis,\
-    QCandlestickSeries,QChartView,QLineSeries
+    QCandlestickSeries,QChartView,QLineSeries,QPieSeries
 from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QSize,QCoreApplication
 from PyQt5.QtGui import QPainter
 from binance.client import Client
@@ -26,6 +26,8 @@ class MainWindow(QMainWindow, form_class):
         self.setupUi(self)
         self.prediction_status=0 # 0:None, 1:buy, -1:sell
         self.init_ui()
+        self.power_status=False
+        self.now=datetime.datetime.now()
 
         with open("config.txt") as f:
             lines = f.readlines()
@@ -43,30 +45,44 @@ class MainWindow(QMainWindow, form_class):
 
     def init_ui(self):
         self.setWindowTitle("binance auto trading")
-        self.start_btn.clicked.connect(self.start)
-        self.stop_btn.clicked.connect(self.stop)
+        self.power_btn.clicked.connect(self.power)
         self.prediction_chart_btn.clicked.connect(self.predictChart)
         self.line_btn.clicked.connect(self.lineChart)
         self.balance_chart_btn.clicked.connect(self.balanceChart)
-        self.log_btn.clicked.connect(self.log)
         self.setting_btn.clicked.connect(self.setting)
         self.close_window_btn.clicked.connect(self.close)
         self.minimize_window_btn.clicked.connect(self.minimize)
 
     # async def start(self):
-    def start(self):
-        self.textEdit.append("predicting...")
-        # loop=asyncio.get_event_loop()
-        # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
-        
-        response=requests.get(SERVER_BASE+'test')
-        if response.json()['message'] =="success":
-            self.buy_limit_order(0.12, 100)
+    def power(self):
+        self.power_status=not self.power_status
+        if self.power_status:
+            self.power_btn.setText("stop")
+            self.sendLog("Start predicting...", level="info")
+            # loop=asyncio.get_event_loop()
+            # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
+            
+            # response=requests.get(SERVER_BASE+'predict')
+            # print(response.json()['data'])
+            # if response.json()['message'] =="success":
+            #     self.buy_limit_order(0.12, 100)
+            # else:
+            #     self.textEdit.append("No order position")
         else:
-            self.textEdit.append("No order position")
-    
-    def stop(self):
-        print("stop")
+            self.power_btn.setText("start")
+            self.sendLog("Stop predicting...", level="")
+
+    def sendLog(self, message: str, format=True, level="info"):
+        if format:
+            if level=="info":
+                message="INFO - " + self.now.strftime('%m-%d %H:%M:%S') + message
+            if level=="warning":
+                message="WARNING - " + self.now.strftime('%m-%d %H:%M:%S') + message
+            if level=="error":
+                message="ERROR - " + self.now.strftime('%m-%d %H:%M:%S') + message
+            if level=="debug":
+                message="DEBUG - " + self.now.strftime('%m-%d %H:%M:%S') + message    
+        self.textEdit.append(message)
 
     def lineChart(self):
         self.series1=QLineSeries()
@@ -148,12 +164,22 @@ class MainWindow(QMainWindow, form_class):
         self.show()
     
     def balanceChart(self):
-        print("balanceChart")
-        self.stackedWidget.setCurrentIndex(4)
-        
-    def log(self):
-        # self.textEdit.append("==============================================log==============================================")
+        status = self.binance.fetch_balance()
+        series=QPieSeries
+        series.append("used balance", int(status['USDT']['used']))
+        series.append("free balance", int(status['USDT']['free']))
+
+        chart=QChart()
+        chart.addSeries(series)
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.setTitle(str(status['USDT']['total']))
+        self.balance_chart_cont.addWidget(self.chart_view)
+        self.frame_17.setStyleSheet(u"background-color:transparent;")
         self.stackedWidget.setCurrentIndex(3)
+
+        # message='total balance : '+str(status['USDT']['total'])+'\nused balance : '+str(status['USDT']['used'])+'\nfree balance : '+str(status['USDT']['free'])
+        # self.textEdit.append(message)
+        self.show()
         
     def setting(self):
         print("setting")
