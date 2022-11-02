@@ -12,10 +12,12 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
 from PyQt5.QtChart import QChart,QDateTimeAxis,QCandlestickSet,QValueAxis,\
     QCandlestickSeries,QChartView,QLineSeries,QPieSeries
-from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QSize,QCoreApplication
+from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
 from PyQt5.QtGui import QPainter
 from binance.client import Client
 from functools import partial
+
+from scheduler import SafeScheduler
 
 form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
 SERVER_BASE='http://127.0.0.1:5000/api/'
@@ -28,6 +30,7 @@ class MainWindow(QMainWindow, form_class):
         self.init_ui()
         self.power_status=False
         self.now=datetime.datetime.now()
+
 
         with open("config.txt") as f:
             lines = f.readlines()
@@ -109,7 +112,6 @@ class MainWindow(QMainWindow, form_class):
         sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
         self.chartView.setSizePolicy(sizePolicy)
-        self.chartView.setMinimumSize(QSize(0,300))
         
         self.line_chart_conf.addWidget(self.chartView)
         self.frame_20.setStyleSheet(u"background-color: transparent;")
@@ -198,6 +200,10 @@ class MainWindow(QMainWindow, form_class):
         df.set_index('datetime', inplace=True)
         return df
 
+    def get_predict_data(self):
+        response=requests.get(SERVER_BASE+'predict')
+        print(response.json()['result'])
+
     # order = client.create_order(
     #     symbol='BNBBTC',
     #     side=SIDE_BUY,
@@ -222,31 +228,29 @@ class MainWindow(QMainWindow, form_class):
         )
         self.textEdit.append("[SELL ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
 
-
-
-class ChartWorker(QThread):
-    dataSent = pyqtSignal(float,float,float,float)
+    # @pyqtSlot(float)
+    # def get_price_5minutes(self):
+    #     if len(self.series1) == self.dataLen :
+    #         self.series1.remove()
+    #     sets = self.series1.sets()
+    #     last_set = sets[-1] 
+    #     self.series.remove(last_set)
     
-    def __init__(self):
-        super().__init__()
-        self.alive = True
-        
-        with open('sample_coin_data.csv') as data:
-            csvReader=csv.reader(data, delimiter=',')
-            
-        
-        # with open("config.txt") as f:
-        #     lines = f.readlines()
-        #     self.ticker = lines[2].strip()
-        #     self.dataLen = int(lines[3].strip())
-        # self.binance = ccxt.binance()
 
-    def run(self):
-        pass
-        # while self.alive:
-        #     df = self.binance.fetch_ticker("BTC/USDT")
-        #     self.dataSent.emit(df['open'],df['high'],df['low'],df['close'])
-        #     time.sleep(5) #5minutes    
+# class ChartWorker(QThread):
+#     dataSent = pyqtSignal(float)
+    
+#     def __init__(self):
+#         super().__init__()
+#         self.alive = True
+#         self.binance = ccxt.binance()
+
+#     def run(self):
+#         pass
+#         while self.alive:
+#             df = self.binance.fetch_ticker("BTC/USDT")
+#             self.dataSent.emit(df['open'],df['high'],df['low'],df['close'])
+#             time.sleep(5) #5minutes    
 
     
 
@@ -254,4 +258,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     mw = MainWindow()
     mw.show()
+
     exit(app.exec_())
