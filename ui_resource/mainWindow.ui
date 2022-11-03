@@ -893,6 +893,12 @@ border-style: solid;
           </property>
           <item>
            <widget class="QTextEdit" name="textEdit">
+            <property name="font">
+             <font>
+              <family>bahnschrift Semibold</family>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

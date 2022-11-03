@@ -1,12 +1,14 @@
 import sys
 import os
 import time
-import datetime
 import ccxt
 import csv
 import requests
 import pandas as pd
 import asyncio
+import aiohttp
+import json
+from datetime import datetime
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
@@ -21,6 +23,10 @@ from scheduler import SafeScheduler
 
 form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
 SERVER_BASE='http://127.0.0.1:5000/api/'
+# async def get_data():
+#     async with aiohttp.ClientSession() as session:
+#             async with session.get(SERVER_BASE+'predict') as response:
+#                 print(response.json())
 
 class MainWindow(QMainWindow, form_class):
     def __init__(self):
@@ -29,8 +35,7 @@ class MainWindow(QMainWindow, form_class):
         self.prediction_status=0 # 0:None, 1:buy, -1:sell
         self.init_ui()
         self.power_status=False
-        self.now=datetime.datetime.now()
-
+        self.now=datetime.now()
 
         with open("config.txt") as f:
             lines = f.readlines()
@@ -61,7 +66,14 @@ class MainWindow(QMainWindow, form_class):
         self.power_status=not self.power_status
         if self.power_status:
             self.power_btn.setText("stop")
-            self.sendLog("Start predicting...", level="info")
+            self.sendLog("data training...", level="")
+            
+            
+            price=self.get_predict_data()
+            date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
+            date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
+            self.sendLog("date : "+date+", priece : "+price, level="info")
+            
             # loop=asyncio.get_event_loop()
             # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
             
@@ -75,16 +87,23 @@ class MainWindow(QMainWindow, form_class):
             self.power_btn.setText("start")
             self.sendLog("Stop predicting...", level="")
 
+
+    def get_predict_data(self):
+        response=requests.get(SERVER_BASE+'predict')
+        print(response.json())
+        
+        return response.json()
+        
     def sendLog(self, message: str, format=True, level="info"):
         if format:
             if level=="info":
-                message="INFO - " + self.now.strftime('%m-%d %H:%M:%S') + message
+                message="INFO - " + self.now.strftime('%m-%d %H:%M:%S') +"  " +message
             if level=="warning":
-                message="WARNING - " + self.now.strftime('%m-%d %H:%M:%S') + message
+                message="WARNING - " + self.now.strftime('%m-%d %H:%M:%S')+"  " + message
             if level=="error":
-                message="ERROR - " + self.now.strftime('%m-%d %H:%M:%S') + message
+                message="ERROR - " + self.now.strftime('%m-%d %H:%M:%S')+"  " + message
             if level=="debug":
-                message="DEBUG - " + self.now.strftime('%m-%d %H:%M:%S') + message    
+                message="DEBUG - " + self.now.strftime('%m-%d %H:%M:%S')+"  " + message    
         self.textEdit.append(message)
 
     def lineChart(self):
@@ -94,7 +113,7 @@ class MainWindow(QMainWindow, form_class):
         df=self.fetch_coin_data(500)
         for index in df.index:
             if rowCount>0:
-                self.series1.append(float(rowCount), df.loc[index, 'close'])
+                self.series1.append(int(rowCount), df.loc[index, 'close'])
             
             rowCount+=1
         
@@ -194,15 +213,12 @@ class MainWindow(QMainWindow, form_class):
         pass
         
     def fetch_coin_data(self, dataLen):
-        ohlcv =self.binance.fetch_ohlcv(self.ticker, '5m', limit=dataLen)
+        ohlcv =self.binance.fetch_ohlcv(self.ticker, '1h', limit=dataLen)
         df = pd.DataFrame(ohlcv, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
         df['datetime'] = pd.to_datetime(df['datetime'], unit='ms')
         df.set_index('datetime', inplace=True)
         return df
 
-    def get_predict_data(self):
-        response=requests.get(SERVER_BASE+'predict')
-        print(response.json()['result'])
 
     # order = client.create_order(
     #     symbol='BNBBTC',
@@ -257,6 +273,7 @@ class MainWindow(QMainWindow, form_class):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mw = MainWindow()
+    mw.lineChart()
     mw.show()
 
     exit(app.exec_())
