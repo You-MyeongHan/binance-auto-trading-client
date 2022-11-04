@@ -69,10 +69,12 @@ class MainWindow(QMainWindow, form_class):
             self.sendLog("data training...", level="")
             
             
-            price=self.get_predict_data()
-            date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
-            date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
-            self.sendLog("date : "+date+", priece : "+price, level="info")
+            data=self.get_predict_data()
+            date='1'
+            price='1'
+            # date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
+            # date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
+            self.sendLog("date : "+ date +", priece : "+price, level="info")
             
             # loop=asyncio.get_event_loop()
             # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
