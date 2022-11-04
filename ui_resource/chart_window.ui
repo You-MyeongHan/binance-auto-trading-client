@@ -6,17 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1323</width>
-    <height>453</height>
+    <width>756</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(43, 49, 58);
-    border-radius: 4px;
-    width: 4px;</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">

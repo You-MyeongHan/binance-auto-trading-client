@@ -12,8 +12,7 @@ from datetime import datetime
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
-from PyQt5.QtChart import QChart,QDateTimeAxis,QCandlestickSet,QValueAxis,\
-    QCandlestickSeries,QChartView,QLineSeries,QPieSeries
+from PyQt5.QtChart import QChart,QDateTimeAxis,QChartView,QLineSeries,QPieSeries
 from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
 from PyQt5.QtGui import QPainter
 from binance.client import Client
@@ -37,6 +36,7 @@ class MainWindow(QMainWindow, form_class):
         self.power_status=False
         self.now=datetime.now()
         self.fee_ratio=0.998
+        self.body_frame.setStyleSheet(u"background-color: transparent;")
         
         with open("config.txt") as f:
             lines = f.readlines()
@@ -55,9 +55,8 @@ class MainWindow(QMainWindow, form_class):
     def init_ui(self):
         self.setWindowTitle("binance auto trading")
         self.power_btn.clicked.connect(self.power)
-        self.prediction_chart_btn.clicked.connect(self.predictChart)
-        self.line_btn.clicked.connect(self.lineChart)
-        self.balance_chart_btn.clicked.connect(self.balanceChart)
+        # self.line_btn.clicked.connect(self.lineChart)
+        # self.balance_chart_btn.clicked.connect(self.balanceChart)
         self.setting_btn.clicked.connect(self.setting)
         self.close_window_btn.clicked.connect(self.close)
         self.minimize_window_btn.clicked.connect(self.minimize)
@@ -124,56 +123,24 @@ class MainWindow(QMainWindow, form_class):
             if level=="debug":
                 message="DEBUG - " + self.now.strftime('%m-%d %H:%M:%S')+"  " + message    
         self.textEdit.append(message)
+        
+    # def balanceChart(self):
+    #     status = self.binance.fetch_balance()
+    #     series=QPieSeries
+    #     series.append("used balance", int(status['USDT']['used']))
+    #     series.append("free balance", int(status['USDT']['free']))
 
-    def lineChart(self):
-        self.series1=QLineSeries()
-        
-        rowCount=0
-        df=self.fetch_coin_data(500)
-        for index in df.index:
-            if rowCount>0:
-                self.series1.append(int(rowCount), df.loc[index, 'close'])
-            
-            rowCount+=1
-        
-        self.chart=QChart()
-        self.chart.legend().hide()
-        self.chart.addSeries(self.series1)
-        self.chart.createDefaultAxes()
-        self.chart.setTitle("BTC/USDT")
-        
-        self.chartView=QChartView(self.chart)
-        self.chartView.setRenderHint(QPainter.Antialiasing)
-        self.chart.setAnimationOptions(QChart.AllAnimations)
-        self.chartView.chart().setTheme(QChart.ChartThemeDark)
-        
-        sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHeightForWidth(self.chartView.sizePolicy().hasHeightForWidth())
-        self.chartView.setSizePolicy(sizePolicy)
-        
-        self.line_chart_conf.addWidget(self.chartView)
-        self.frame_20.setStyleSheet(u"background-color: transparent;")
-        self.stackedWidget.setCurrentIndex(1)
-        
-   
-    
-    def balanceChart(self):
-        status = self.binance.fetch_balance()
-        series=QPieSeries
-        series.append("used balance", int(status['USDT']['used']))
-        series.append("free balance", int(status['USDT']['free']))
+    #     chart=QChart()
+    #     chart.addSeries(series)
+    #     chart.setAnimationOptions(QChart.SeriesAnimations)
+    #     chart.setTitle(str(status['USDT']['total']))
+    #     self.balance_chart_cont.addWidget(self.chart_view)
+    #     self.frame_17.setStyleSheet(u"background-color:transparent;")
+    #     self.stackedWidget.setCurrentIndex(3)
 
-        chart=QChart()
-        chart.addSeries(series)
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-        chart.setTitle(str(status['USDT']['total']))
-        self.balance_chart_cont.addWidget(self.chart_view)
-        self.frame_17.setStyleSheet(u"background-color:transparent;")
-        self.stackedWidget.setCurrentIndex(3)
-
-        # message='total balance : '+str(status['USDT']['total'])+'\nused balance : '+str(status['USDT']['used'])+'\nfree balance : '+str(status['USDT']['free'])
-        # self.textEdit.append(message)
-        self.show()
+    #     message='total balance : '+str(status['USDT']['total'])+'\nused balance : '+str(status['USDT']['used'])+'\nfree balance : '+str(status['USDT']['free'])
+    #     self.textEdit.append(message)
+    #     self.show()
         
     def setting(self):
         print("setting")
@@ -257,7 +224,6 @@ class MainWindow(QMainWindow, form_class):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mw = MainWindow()
-    mw.lineChart()
     mw.show()
 
     exit(app.exec_())
