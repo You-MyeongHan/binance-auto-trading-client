@@ -290,6 +290,11 @@ QMenu::separator {
    </property>
    <item>
     <widget class="QFrame" name="frame">
+     <property name="styleSheet">
+      <string notr="true">#frame{
+border-style:none;
+}</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -323,7 +328,7 @@ QMenu::separator {
          </font>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -341,7 +346,7 @@ QMenu::separator {
          </font>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -359,7 +364,7 @@ QMenu::separator {
          </font>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

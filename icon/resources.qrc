@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>minimize-2.svg</file>
     <file>trending-up.svg</file>
     <file>minus.svg</file>
     <file>x.svg</file>

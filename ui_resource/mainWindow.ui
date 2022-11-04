@@ -648,7 +648,7 @@ border-style: solid;
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="maximize_window_btn">
+              <widget class="QPushButton" name="restore_window_btn">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>

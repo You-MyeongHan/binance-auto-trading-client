@@ -14,7 +14,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
 from PyQt5.QtChart import QChart,QDateTimeAxis,QChartView,QLineSeries,QPieSeries
 from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QIcon
 from binance.client import Client
 from functools import partial
 
@@ -31,12 +31,12 @@ class MainWindow(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setWindowFlag(Qt.FramelessWindowHint)
         self.prediction_status=0 # 0:None, 1:buy, -1:sell
         self.init_ui()
         self.power_status=False
         self.now=datetime.now()
         self.fee_ratio=0.998
-        self.body_frame.setStyleSheet(u"background-color: transparent;")
         
         with open("config.txt") as f:
             lines = f.readlines()
@@ -49,7 +49,15 @@ class MainWindow(QMainWindow, form_class):
             'apiKey': self.api_key,
             'secret': self.sec_key
         })
-    
+
+        def moveWindow(e):
+            if self.isMaximized() == False:
+                if e.buttons() == Qt.LeftButton:
+                    self.move(self.pos() + e.globalPos() - self.clickPosition)
+                    self.clickPosition = e.globalPos()
+                    e.accept()
+        self.header_frame.mouseMoveEvent=moveWindow
+        
         self.show()
 
     def init_ui(self):
@@ -59,27 +67,34 @@ class MainWindow(QMainWindow, form_class):
         # self.balance_chart_btn.clicked.connect(self.balanceChart)
         self.setting_btn.clicked.connect(self.setting)
         self.close_window_btn.clicked.connect(QCoreApplication.instance().quit)
-        self.maximize_window_btn.clicked.connect(self.showFullScreen)
-        # self.minimize_window_btn.clicked.connect()
+        self.restore_window_btn.clicked.connect(self.restore_or_maximize_window)
+        self.minimize_window_btn.clicked.connect(self.showMinimized)
+        
     # async def start(self):
+    def mousePressEvent(self, event):
+        self.clickPosition=event.globalPos()
+        
     def power(self):
         self.power_status=not self.power_status
         if self.power_status:
             self.power_btn.setText("stop")
+            self.sendLog("++++++++++++++++++++++++++++++++++++++++++START++++++++++++++++++++++++++++++++++++++++++", level="")
             self.sendLog("data training...", level="")
             
             
             data=self.get_predict_data()
-            date=['1','2','3','4','5']
-            price=[19700,18500,21000,16800,22000]
+            price=data['close']
+            date=data['date']
+            # date=['1','2','3','4','5']
+            # price=[19700,18500,21000,16800,22000]
             self.current_price=self.binance.fetch_ticker(self.ticker)['bid']
             
             # date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
             # date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
             self.sendLog(message="Finish creating prediction dataset", level="info")
             
-            for i in range(len(date)):
-                message="date : "+ date[i] +", priece : "+str(price[i])
+            for i in range(len(data)-10, len(data)):
+                message="date : "+ str(date[i]) +", priece : "+str(price[i])
                 self.sendLog(message, level="info")
                 
             self.sendLog(message="Set Target price", level="info")
@@ -103,14 +118,14 @@ class MainWindow(QMainWindow, form_class):
             #     self.textEdit.append("No order position")
         else:
             self.power_btn.setText("start")
-            self.sendLog("Stop predicting...", level="")
+            self.sendLog("++++++++++++++++++++++++++++++++++++++++++STOP+++++++++++++++++++++++++++++++++++++++++++", level="")
 
 
     def get_predict_data(self):
         response=requests.get(SERVER_BASE+'predict')
-        print(response.json())
-        
-        return response.json()
+        response=response.json()
+        data=pd.read_json(response)
+        return data
         
     def sendLog(self, message: str, format=True, level="info"):
         if format:
@@ -145,9 +160,14 @@ class MainWindow(QMainWindow, form_class):
     def setting(self):
         print("setting")
 
-    def screen_size(self):
-        pass
-        
+    def restore_or_maximize_window(self):
+        if self.isFullScreen():
+            self.showNormal()
+            self.restore_window_btn.setIcon(QIcon(u":/icons/maximize-2.svg"))
+        else:
+            self.showFullScreen()
+            self.restore_window_btn.setIcon(QIcon(u":/icons/minimize-2.svg"))
+    
     def fetch_coin_data(self, dataLen):
         ohlcv =self.binance.fetch_ohlcv(self.ticker, '1h', limit=dataLen)
         df = pd.DataFrame(ohlcv, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
@@ -175,7 +195,7 @@ class MainWindow(QMainWindow, form_class):
             self.textEdit.append("[BUY ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
         except Exception as e:
             print(e)
-            self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
+            self.sendLog('binance Account has insufficient balance for requested action.',level='warning')
         
 
     def sell_market_order(self, price, amount):
@@ -190,36 +210,8 @@ class MainWindow(QMainWindow, form_class):
             print(e)
             self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
         
-
-    # @pyqtSlot(float)
-    # def get_price_5minutes(self):
-    #     if len(self.series1) == self.dataLen :
-    #         self.series1.remove()
-    #     sets = self.series1.sets()
-    #     last_set = sets[-1] 
-    #     self.series.remove(last_set)
-    
-
-# class ChartWorker(QThread):
-#     dataSent = pyqtSignal(float)
-    
-#     def __init__(self):
-#         super().__init__()
-#         self.alive = True
-#         self.binance = ccxt.binance()
-
-#     def run(self):
-#         pass
-#         while self.alive:
-#             df = self.binance.fetch_ticker("BTC/USDT")
-#             self.dataSent.emit(df['open'],df['high'],df['low'],df['close'])
-#             time.sleep(5) #5minutes    
-
-    
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mw = MainWindow()
     mw.show()
-
     exit(app.exec_())
