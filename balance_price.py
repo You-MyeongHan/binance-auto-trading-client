@@ -6,7 +6,6 @@ import ccxt
 import time
 class OverViewWorker(QThread):
     dataSent = pyqtSignal(float, float, float)
-    
     def __init__(self, ticker):
         super().__init__()
         self.ticker = ticker

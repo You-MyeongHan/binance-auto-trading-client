@@ -22,11 +22,30 @@ from scheduler import SafeScheduler
 
 form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
 SERVER_BASE='http://127.0.0.1:5000/api/'
-# async def get_data():
-#     async with aiohttp.ClientSession() as session:
-#             async with session.get(SERVER_BASE+'predict') as response:
-#                 print(response.json())
 
+class PredictionWorker(QThread):
+    dataSent=pyqtSignal(pd.Series,pd.Series)
+    
+    def __init__(self, ticker):
+        super().__init__()
+        self.ticker = ticker
+        self.alive = True
+    
+    def run(self):
+        data=self.get_predict_data()
+        price=data['close']
+        date=data['date']
+        self.dataSent.emit(price, date)
+        time.sleep(3600)
+        
+    def get_predict_data(self):
+        response=requests.get(SERVER_BASE+'predict')
+        response=response.json()
+        data=pd.read_json(response)
+        return data
+    
+    def close(self):
+        self.alive = False
 
 class MainWindow(QMainWindow, form_class):
     def __init__(self):
@@ -82,51 +101,30 @@ class MainWindow(QMainWindow, form_class):
             self.sendLog("++++++++++++++++++++++++++++++++++++++++++START++++++++++++++++++++++++++++++++++++++++++", level="")
             self.sendLog("data training...", level="")
             
-            
-            data=self.get_predict_data()
-            price=data['close']
-            date=data['date']
-            # date=['1','2','3','4','5']
-            # price=[19700,18500,21000,16800,22000]
-            self.current_price=self.binance.fetch_ticker(self.ticker)['bid']
-            
-            # date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
-            # date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
-            self.sendLog(message="Finish creating prediction dataset", level="info")
-            
-            for i in range(len(data)-10, len(data)):
-                message="date : "+ str(date[i]) +", priece : "+str(price[i])
-                self.sendLog(message, level="info")
-                
-            self.sendLog(message="Set Target price", level="info")
-            balance=self.fetch_balance()
-            if self.fee_ratio*self.current_price < min(price) and balance['USDT']['free'] > balance['BTC']['used'] :
-                self.buy_market_order(price=self.current_price, amount=0.01)  
-                self.sendLog(message="Buy order executed", level="info")
-            elif self.fee_ratio*self.current_price > min(price) and balance['USDT']['free'] > balance['BTC']['used']:
-                self.sell_market_order(price=self.current_price, amount=0.01) 
-                self.sendLog(message="Sell order executed", level="info")
-            else:
-                self.sendLog(message="It is not a good time to set a position", level="info")
-            # loop=asyncio.get_event_loop()
-            # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
-            
-            # response=requests.get(SERVER_BASE+'predict')
-            # print(response.json()['data'])
-            # if response.json()['message'] =="success":
-            #     self.buy_limit_order(0.12, 100)
-            # else:
-            #     self.textEdit.append("No order position")
+            self.pw=PredictionWorker(self.ticker)
+            self.pw.dataSent.connect(self.auto_trading)
+            self.pw.start()
         else:
             self.power_btn.setText("start")
             self.sendLog("++++++++++++++++++++++++++++++++++++++++++STOP+++++++++++++++++++++++++++++++++++++++++++", level="")
-
-
-    def get_predict_data(self):
-        response=requests.get(SERVER_BASE+'predict')
-        response=response.json()
-        data=pd.read_json(response)
-        return data
+        
+    def auto_trading(self, price, date):
+        self.current_price=self.binance.fetch_ticker(self.ticker)['bid']
+        self.sendLog(message="Finish creating prediction dataset", level="info")
+        for i in range(len(date)-10, len(date)):
+            message="date : "+ str(date[i]) +", priece : "+str(price[i])
+            self.sendLog(message, level="info")
+            
+        self.sendLog(message="Set Target price", level="info")
+        balance=self.fetch_balance()
+        if self.fee_ratio*self.current_price < min(price) and balance['USDT']['free'] > balance['BTC']['used'] :
+            self.buy_market_order(price=self.current_price, amount=0.01)  
+            self.sendLog(message="Buy order executed", level="info")
+        elif self.fee_ratio*self.current_price > min(price) and balance['USDT']['free'] > balance['BTC']['used']:
+            self.sell_market_order(price=self.current_price, amount=0.01) 
+            self.sendLog(message="Sell order executed", level="info")
+        else:
+            self.sendLog(message="It is not a good time to set a position", level="info")
         
     def sendLog(self, message: str, format=True, level="info"):
         if format:
