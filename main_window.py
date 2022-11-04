@@ -36,7 +36,8 @@ class MainWindow(QMainWindow, form_class):
         self.init_ui()
         self.power_status=False
         self.now=datetime.now()
-
+        self.fee_ratio=0.998
+        
         with open("config.txt") as f:
             lines = f.readlines()
             self.api_key=lines[0].strip()
@@ -70,12 +71,28 @@ class MainWindow(QMainWindow, form_class):
             
             
             data=self.get_predict_data()
-            date='1'
-            price='1'
+            date=['1','2','3','4','5']
+            price=[19700,18500,21000,16800,22000]
+            self.current_price=self.binance.fetch_ticker(self.ticker)['bid']
+            
             # date=datetime.fromtimestamp((self.get_predict_data()['date']+3600000)/1000)
             # date=datetime.strftime(date, "%Y-%m-%d %H:%m:%S")
-            self.sendLog("date : "+ date +", priece : "+price, level="info")
+            self.sendLog(message="Finish creating prediction dataset", level="info")
             
+            for i in range(len(date)):
+                message="date : "+ date[i] +", priece : "+str(price[i])
+                self.sendLog(message, level="info")
+                
+            self.sendLog(message="Set Target price", level="info")
+            balance=self.fetch_balance()
+            if self.fee_ratio*self.current_price < min(price) and balance['USDT']['free'] > balance['BTC']['used'] :
+                self.buy_market_order(price=self.current_price, amount=0.01)  
+                self.sendLog(message="Buy order executed", level="info")
+            elif self.fee_ratio*self.current_price > min(price) and balance['USDT']['free'] > balance['BTC']['used']:
+                self.sell_market_order(price=self.current_price, amount=0.01) 
+                self.sendLog(message="Sell order executed", level="info")
+            else:
+                self.sendLog(message="It is not a good time to set a position", level="info")
             # loop=asyncio.get_event_loop()
             # req=await loop.run_in_executor(None, requests.get, SERVER_BASE+'test')
             
@@ -138,53 +155,7 @@ class MainWindow(QMainWindow, form_class):
         self.frame_20.setStyleSheet(u"background-color: transparent;")
         self.stackedWidget.setCurrentIndex(1)
         
-    def predictChart(self):
-        
-        self.minute_cur = QDateTime.currentDateTime()   # current
-        self.minute_pre = self.minute_cur.addSecs(-300)  # 5 minute ago
-        self.ticks = pd.Series(dtype='float64')
-        
-        series = QCandlestickSeries()
-        series.setIncreasingColor(Qt.red)
-        series.setDecreasingColor(Qt.blue)
-        
-        df=self.fetch_coin_data(50)
-        
-        for index in df.index:
-            open = df.loc[index, 'open']
-            high = df.loc[index, 'high']
-            low = df.loc[index, 'low']
-            close = df.loc[index, 'close']
-
-            format = "%Y-%m-%d %H:%M:%S"
-            str_time = index.strftime(format)
-            dt = QDateTime.fromString(str_time, "MM-dd hh:mm:ss")
-            ts = dt.toMSecsSinceEpoch()
-            
-            elem = QCandlestickSet(open, high, low, close, ts)
-            series.append(elem)
-            
-        chart = QChart()
-        chart.legend().hide()
-        chart.addSeries(series)
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-
-        axis_x = QDateTimeAxis()
-        axis_x.setFormat("hh:mm:ss")
-        chart.addAxis(axis_x, Qt.AlignBottom)
-        series.attachAxis(axis_x)
-
-        axis_y = QValueAxis()
-        axis_y.setLabelFormat("%i")
-        chart.addAxis(axis_y, Qt.AlignLeft)
-        series.attachAxis(axis_y)
-
-        self.chart_view=QChartView(chart)
-        self.chart_view.setRenderHint(QPainter.Antialiasing)
-        self.prediction_chart_cont.addWidget(self.chart_view)
-        self.frame_16.setStyleSheet(u"background-color:transparent;")
-        self.stackedWidget.setCurrentIndex(2)
-        self.show()
+   
     
     def balanceChart(self):
         status = self.binance.fetch_balance()
@@ -221,7 +192,8 @@ class MainWindow(QMainWindow, form_class):
         df.set_index('datetime', inplace=True)
         return df
 
-
+    def fetch_balance(self):
+        return self.binance.fetch_balance()
     # order = client.create_order(
     #     symbol='BNBBTC',
     #     side=SIDE_BUY,
@@ -230,21 +202,31 @@ class MainWindow(QMainWindow, form_class):
     #     quantity=100,
     #     price='0.00001')
 
-    def buy_market_order(self, price, amount=1):
-        order = self.binance.create_limit_buy_order(
-            symbol=self.ticker, 
-            price=price,
-            amount=amount
-        )
-        self.textEdit.append("[BUY ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
+    def buy_market_order(self, price, amount):
+        try:
+            order = self.binance.create_limit_buy_order(
+                symbol=self.ticker, 
+                price=price,
+                amount=amount
+            )
+            self.textEdit.append("[BUY ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
+        except Exception as e:
+            print(e)
+            self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
+        
 
-    def sell_market_order(self, price, amount=1):
-        order = self.binance.create_limit_sell_order(
-            symbol=self.ticker, 
-            price=price,
-            amount=amount
-        )
-        self.textEdit.append("[SELL ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
+    def sell_market_order(self, price, amount):
+        try:
+            order = self.binance.create_limit_sell_order(
+                symbol=self.ticker, 
+                price=price,
+                amount=amount
+            )
+            self.textEdit.append("[SELL ORDER]\n"+order['datetime']+" - "+order['price']+" - "+ order['amount'])
+        except Exception as e:
+            print(e)
+            self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
+        
 
     # @pyqtSlot(float)
     # def get_price_5minutes(self):
