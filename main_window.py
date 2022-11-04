@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy
+from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy,QInputDialog
 from PyQt5.QtChart import QChart,QDateTimeAxis,QChartView,QLineSeries,QPieSeries
 from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
 from PyQt5.QtGui import QPainter, QIcon
@@ -26,6 +26,7 @@ SERVER_BASE='http://127.0.0.1:5000/api/'
 #     async with aiohttp.ClientSession() as session:
 #             async with session.get(SERVER_BASE+'predict') as response:
 #                 print(response.json())
+
 
 class MainWindow(QMainWindow, form_class):
     def __init__(self):
@@ -158,7 +159,7 @@ class MainWindow(QMainWindow, form_class):
     #     self.show()
         
     def setting(self):
-        print("setting")
+        pass
 
     def restore_or_maximize_window(self):
         if self.isFullScreen():
@@ -209,7 +210,7 @@ class MainWindow(QMainWindow, form_class):
         except Exception as e:
             print(e)
             self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
-        
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mw = MainWindow()
