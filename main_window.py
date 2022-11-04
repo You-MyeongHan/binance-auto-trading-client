@@ -49,7 +49,7 @@ class MainWindow(QMainWindow, form_class):
             'apiKey': self.api_key,
             'secret': self.sec_key
         })
-
+    
         self.show()
 
     def init_ui(self):
@@ -58,9 +58,9 @@ class MainWindow(QMainWindow, form_class):
         # self.line_btn.clicked.connect(self.lineChart)
         # self.balance_chart_btn.clicked.connect(self.balanceChart)
         self.setting_btn.clicked.connect(self.setting)
-        self.close_window_btn.clicked.connect(self.close)
-        self.minimize_window_btn.clicked.connect(self.minimize)
-
+        self.close_window_btn.clicked.connect(QCoreApplication.instance().quit)
+        self.maximize_window_btn.clicked.connect(self.showFullScreen)
+        # self.minimize_window_btn.clicked.connect()
     # async def start(self):
     def power(self):
         self.power_status=not self.power_status
@@ -144,12 +144,8 @@ class MainWindow(QMainWindow, form_class):
         
     def setting(self):
         print("setting")
-    
-    def close(self):
-        self.alive = False
-        self.close_window_btn.clicked.connect(QCoreApplication.instance().quit)
 
-    def minimize(self):
+    def screen_size(self):
         pass
         
     def fetch_coin_data(self, dataLen):

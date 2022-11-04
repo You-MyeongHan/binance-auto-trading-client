@@ -482,26 +482,23 @@ border-style: solid;
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QPushButton" name="pushButton_5">
-            <property name="text">
-             <string>testing...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_6">
-            <property name="text">
-             <string>testing...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_7">
-            <property name="text">
-             <string>testing...</string>
-            </property>
-           </widget>
+           <widget class="BalanceWidget" name="widget_2" native="true"/>
           </item>
          </layout>
         </widget>
@@ -796,6 +793,12 @@ border-style: solid;
    <class>ChartWidget</class>
    <extends>QWidget</extends>
    <header>chart</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BalanceWidget</class>
+   <extends>QWidget</extends>
+   <header>balance_price</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
