@@ -545,11 +545,6 @@ border: 2px solid #5A5A5A;
                 <string>MSE</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string>RMSE</string>
-               </property>
-              </item>
              </widget>
             </item>
             <item>
