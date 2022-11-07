@@ -27,7 +27,7 @@ class OverViewWorker(QThread):
         while self.alive:
             data=self.binance.fetch_balance()
             price=self.binance.fetch_ticker(self.ticker)
-            self.dataSent.emit(price['bid'],data['USDT']['free'],data['BTC']['used'])
+            self.dataSent.emit(price['bid'],data['USDT']['total'],data['BTC']['total'])
             time.sleep(3)
         
     def close(self):

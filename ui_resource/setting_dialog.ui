@@ -295,7 +295,10 @@ QMenu::separator {
    <item>
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">#frame
+{
+border: 2px solid #5A5A5A;
+}</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -561,7 +564,7 @@ QMenu::separator {
               </property>
               <item>
                <property name="text">
-                <string>linear</string>
+                <string>tanh</string>
                </property>
               </item>
               <item>
@@ -571,12 +574,12 @@ QMenu::separator {
               </item>
               <item>
                <property name="text">
-                <string>tanh</string>
+                <string>relu</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>relu</string>
+                <string>linear</string>
                </property>
               </item>
              </widget>
@@ -588,39 +591,47 @@ QMenu::separator {
        </widget>
       </item>
       <item>
-       <widget class="QDialogButtonBox" name="buttonBox">
+       <widget class="QFrame" name="frame_5">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
-        <property name="font">
-         <font>
-          <family>Bahnschrift SemiBold</family>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="OK_btn">
+           <property name="font">
+            <font>
+             <family>Bahnschrift SemiBold</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>OK</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancel_btn">
+           <property name="font">
+            <font>
+             <family>Bahnschrift SemiBold</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>CANCEL</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

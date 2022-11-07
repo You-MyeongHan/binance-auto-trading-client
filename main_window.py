@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy,QInputDialog
+from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy,QDialog
 from PyQt5.QtChart import QChart,QDateTimeAxis,QChartView,QLineSeries,QPieSeries
 from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
 from PyQt5.QtGui import QPainter, QIcon
@@ -85,10 +85,10 @@ class MainWindow(QMainWindow, form_class):
         self.power_btn.clicked.connect(self.power)
         # self.line_btn.clicked.connect(self.lineChart)
         # self.balance_chart_btn.clicked.connect(self.balanceChart)
-        self.setting_btn.clicked.connect(self.setting)
         self.close_window_btn.clicked.connect(QCoreApplication.instance().quit)
         self.restore_window_btn.clicked.connect(self.restore_or_maximize_window)
         self.minimize_window_btn.clicked.connect(self.showMinimized)
+        self.setting_btn.clicked.connect(self.setting)
         
     # async def start(self):
     def mousePressEvent(self, event):
@@ -157,7 +157,12 @@ class MainWindow(QMainWindow, form_class):
     #     self.show()
         
     def setting(self):
-        pass
+        dialog=SettingDialog()
+        dialog.exec_()
+        self.epochs=dialog.epochs
+        self.model=dialog.model
+        self.loss=dialog.loss
+        self.activation=dialog.activation
 
     def restore_or_maximize_window(self):
         if self.isFullScreen():
@@ -208,6 +213,32 @@ class MainWindow(QMainWindow, form_class):
         except Exception as e:
             print(e)
             self.sendLog('Maybe You do not have enough money or the amount of order size is too small',level='warning')
+
+class SettingDialog(QDialog):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        uic.loadUi("ui_resource/setting_dialog.ui", self)
+        self.init_ui()
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.epochs=50
+        self.model="LSTM"
+        self.loss="MSE"
+        self.activation="tanh"
+        
+    def init_ui(self):
+        self.OK_btn.clicked.connect(self.pushButtonClicked)
+        self.cancel_btn.clicked.connect(self.close)
+        
+    def pushButtonClicked(self):
+        self.epochs = self.lineEdit.text()
+        self.model = self.comboBox_3.text()
+        self.loss=self.comboBox.text()
+        self.activation=self.comboBox_2.text()
+        self.close()
+    
+    def close(self):
+        self.reject()
+        
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
