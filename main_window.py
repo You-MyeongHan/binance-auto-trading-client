@@ -24,10 +24,16 @@ SERVER_BASE='http://127.0.0.1:5000/api/'
 class PredictionWorker(QThread):
     dataSent=pyqtSignal(pd.Series,pd.Series)
     
-    def __init__(self, ticker):
+    def __init__(self, ticker, epochs, model, loss, activation):
         super().__init__()
         self.ticker = ticker
         self.alive = True
+        self.epochs=epochs
+        self.model=model
+        self.loss=loss
+        if self.loss=="MSE":
+            self.loss="mean_squared_error"
+        self.activation=activation
     
     def run(self):
         data=self.get_predict_data()
@@ -37,7 +43,8 @@ class PredictionWorker(QThread):
         time.sleep(3600)
         
     def get_predict_data(self):
-        response=requests.get(SERVER_BASE+'predict')
+        params={'epochs':self.epochs, 'model':self.model, 'loss':self.loss, 'activation':self.activation}
+        response=requests.get(SERVER_BASE+'predict',params=params)
         response=response.json()
         data=pd.read_json(response)
         return data
@@ -56,6 +63,11 @@ class MainWindow(QMainWindow, form_class):
         self.now=datetime.now()
         self.buy_fee_ratio=1.002
         self.sell_fee_ratio=0.098
+        self.epochs=50
+        self.model="LSTM"
+        self.loss="MSE"
+
+        self.activation="tanh"
         
         with open("config.txt") as f:
             lines = f.readlines()
@@ -100,7 +112,7 @@ class MainWindow(QMainWindow, form_class):
             self.sendLog("++++++++++++++++++++++++++++++++++++++++++START++++++++++++++++++++++++++++++++++++++++++", level="")
             self.sendLog("data training...", level="")
             
-            self.pw=PredictionWorker(self.ticker)
+            self.pw=PredictionWorker(self.ticker, self.epochs, self.model, self.loss, self.activation)
             self.pw.dataSent.connect(self.auto_trading)
             self.pw.start()
         else:
@@ -234,9 +246,9 @@ class SettingDialog(QDialog):
         
     def pushButtonClicked(self):
         self.epochs = self.lineEdit.text()
-        self.model = self.comboBox_3.text()
-        self.loss=self.comboBox.text()
-        self.activation=self.comboBox_2.text()
+        self.model = self.comboBox_3.currentText()
+        self.loss=self.comboBox.currentText()
+        self.activation=self.comboBox_2.currentText()
         self.close()
     
     def close(self):
