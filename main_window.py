@@ -18,8 +18,6 @@ from PyQt5.QtGui import QPainter, QIcon
 from binance.client import Client
 from functools import partial
 
-from scheduler import SafeScheduler
-
 form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
 SERVER_BASE='http://127.0.0.1:5000/api/'
 
@@ -56,7 +54,8 @@ class MainWindow(QMainWindow, form_class):
         self.init_ui()
         self.power_status=False
         self.now=datetime.now()
-        self.fee_ratio=0.998
+        self.buy_fee_ratio=1.002
+        self.sell_fee_ratio=0.098
         
         with open("config.txt") as f:
             lines = f.readlines()
@@ -107,6 +106,7 @@ class MainWindow(QMainWindow, form_class):
         else:
             self.power_btn.setText("start")
             self.sendLog("++++++++++++++++++++++++++++++++++++++++++STOP+++++++++++++++++++++++++++++++++++++++++++", level="")
+            self.pw.close()
         
     def auto_trading(self, price, date):
         self.current_price=self.binance.fetch_ticker(self.ticker)['bid']
@@ -115,16 +115,19 @@ class MainWindow(QMainWindow, form_class):
             message="date : "+ str(date[i]) +", priece : "+str(price[i])
             self.sendLog(message, level="info")
             
-        self.sendLog(message="Set Target price", level="info")
+        self.sendLog(message="Set Target price : "+str(min(price.tail(10))), level="info")
         balance=self.fetch_balance()
-        if self.fee_ratio*self.current_price < min(price) and balance['USDT']['free'] > balance['BTC']['used'] :
-            self.buy_market_order(price=self.current_price, amount=0.01)  
+        buy_least_price=self.buy_fee_ratio*self.current_price
+        sell_least_price=self.sell_fee_ratio*self.current_price
+
+        if buy_least_price < min(price.tail(10)) and balance['USDT']['total'] > balance['BTC']['total']*self.current_price :
+            self.buy_market_order(price=self.current_price, amount=0.01)
             self.sendLog(message="Buy order executed", level="info")
-        elif self.fee_ratio*self.current_price > min(price) and balance['USDT']['free'] > balance['BTC']['used']:
+        elif sell_least_price >= min(price.tail(10)) and balance['USDT']['total'] < balance['BTC']['total']*self.current_price:
             self.sell_market_order(price=self.current_price, amount=0.01) 
             self.sendLog(message="Sell order executed", level="info")
         else:
-            self.sendLog(message="It is not a good time to set a position", level="info")
+            self.sendLog(message="It's not a good time to set a position", level="info")
         
     def sendLog(self, message: str, format=True, level="info"):
         if format:

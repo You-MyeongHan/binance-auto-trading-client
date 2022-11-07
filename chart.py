@@ -55,7 +55,8 @@ class ChartWidget(QWidget):
         axisX = QDateTimeAxis()
         axisX.setFormat("MM-dd hh:mm:ss")
         self.chart.addAxis(axisX, Qt.AlignBottom)
-        axisX.setTickCount(10)
+        self.series1.attachAxis(axisX)
+        axisX.setTickCount(6)
         
         axisY = QValueAxis()
         axisY.setLabelFormat("%i $")
