@@ -1,9 +1,11 @@
 import sys
+import os
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 import ccxt
 import time
+BASE_DIR=os.path.dirname(os.path.abspath(__file__))
 class OverViewWorker(QThread):
     dataSent = pyqtSignal(float, float, float)
     def __init__(self, ticker):
@@ -37,7 +39,7 @@ class OverViewWorker(QThread):
 class BalanceWidget(QWidget):
     def __init__(self, parent=None, ticker="BTC/USDT"):
         super().__init__(parent)
-        uic.loadUi("ui_resource/balance_price.ui", self)
+        uic.loadUi(BASE_DIR+"\\ui_resource\\balance_price.ui", self)
         
         self.ticker = ticker
         self.bp = OverViewWorker(ticker)

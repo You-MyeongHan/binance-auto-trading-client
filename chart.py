@@ -1,3 +1,4 @@
+import os
 import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget,QSizePolicy
@@ -8,6 +9,7 @@ import time
 import pandas as pd
 import ccxt 
 from PyQt5.QtCore import QThread, pyqtSignal
+BASE_DIR=os.path.dirname(os.path.abspath(__file__))
 
 class chartWorker(QThread):
     dataSent = pyqtSignal(float)
@@ -32,7 +34,7 @@ class chartWorker(QThread):
 class ChartWidget(QWidget):
     def __init__(self, parent=None, ticker="BTC/USDT"):
         super().__init__(parent)
-        uic.loadUi("ui_resource/chart_window.ui", self)
+        uic.loadUi(BASE_DIR+"\\ui_resource\\chart_window.ui", self)
         binance = ccxt.binance()
         ohlcv = binance.fetch_ohlcv(symbol=ticker, timeframe='1h')
         df = pd.DataFrame(ohlcv, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])

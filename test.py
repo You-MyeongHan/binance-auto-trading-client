@@ -1,36 +1,37 @@
+from PyQt5.QtWidgets import QApplication, QGraphicsView, QGridLayout
 import sys
-from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QSizePolicy,QDialog
-from PyQt5.QtChart import QChart,QDateTimeAxis,QChartView,QLineSeries,QPieSeries
-from PyQt5.QtCore import Qt, QDateTime, pyqtSignal, QThread,QCoreApplication,pyqtSlot
-from PyQt5.QtGui import QPainter, QIcon
-from binance.client import Client
-from functools import partial
+import finplot as fplt
+import ccxt
+import pandas as pd
+fplt.candle_bull_color = "#FF0000"
+fplt.candle_bull_body_color = "#FF0000" 
+fplt.candle_bear_color = "#0000FF"
 
-class SettingDialog(QDialog):
-    def __inin__(self, parent=None):
-        super().__init__(parent)
-        uic.loadUi("ui_resource/setting_dialog.ui", self)
-        uic.show()
-        self.epochs=50
-        self.model="LSTM"
-        self.loss="MSE"
-        self.activation="tanh"
-        self.init_ui()
-        
-    def init_ui(self):
-        self.OK_btn.clicked.connect(self.pushButtonClicked)
-        self.exec_()
-        
-    def pushButtonClicked(self):
-        self.epochs = self.lineEdit.text()
-        self.model = self.conboBox_3.text()
-        self.loss=self.conboBox.text()
-        self.activation=self.conboBox_2.text()
-        self.close()
+
+class MyWindow(QGraphicsView):
+    def __init__(self, ticker):
+        super().__init__()
+
+        self.setWindowTitle("QGraphicsView")
+        layout = QGridLayout()
+        self.setLayout(layout)
+        self.resize(800, 300)
+
+        # ax
+        ax = fplt.create_plot(init_zoom_periods=100)
+        self.axs = [ax] # finplot requres this property
+        layout.addWidget(ax.vb.win, 0, 0)
+
+        binance = ccxt.binance()
+        ohlcv = binance.fetch_ohlcv(symbol=ticker, timeframe='1h')
+        df = pd.DataFrame(ohlcv, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
+        df.set_index('datetime', inplace=True)
+        fplt.candlestick_ochl(df[['open', 'close', 'high', 'low']])
+        fplt.show(qt_exec=False)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    mw = SettingDialog()
-    mw.show()
-    exit(app.exec_())
+    win = MyWindow("BTC/USDT") 
+    win.show()
+    app.exec_()

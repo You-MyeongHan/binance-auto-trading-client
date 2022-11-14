@@ -18,7 +18,8 @@ from PyQt5.QtGui import QPainter, QIcon
 from binance.client import Client
 from functools import partial
 
-form_class = uic.loadUiType("ui_resource/mainWindow.ui")[0]
+BASE_DIR=os.path.dirname(os.path.abspath(__file__))
+form_class = uic.loadUiType(BASE_DIR+"\\ui_resource\\mainWindow.ui")[0]
 SERVER_BASE='http://127.0.0.1:5000/api/'
 
 class PredictionWorker(QThread):
@@ -232,7 +233,7 @@ class MainWindow(QMainWindow, form_class):
 class SettingDialog(QDialog):
     def __init__(self,parent=None):
         super().__init__(parent)
-        uic.loadUi("ui_resource/setting_dialog.ui", self)
+        uic.loadUi(BASE_DIR+"\\ui_resource\\setting_dialog.ui", self)
         self.init_ui()
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.epochs=50
