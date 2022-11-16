@@ -32,18 +32,32 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="styleSheet">
       <string notr="true">QWidget{
-background-color:rgba(22, 26, 30);
-border-radius:15px;
+background-color:rgb(22, 26, 30);
 }
 QLineEdit{
 background-color:rgba(0,0,0,0);
@@ -68,7 +82,7 @@ background-color:rgb(122,122,122);
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
        <number>0</number>
@@ -87,6 +101,64 @@ background-color:rgb(122,122,122);
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
+        <widget class="QPushButton" name="close_window_btn">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>20</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../icon/resources.qrc">
+           <normaloff>:/icons/x.svg</normaloff>:/icons/x.svg</iconset>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="minimize_window_btn">
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>20</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../icon/resources.qrc">
+           <normaloff>:/icons/minus.svg</normaloff>:/icons/minus.svg</iconset>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
@@ -202,7 +274,7 @@ background-color:rgb(122,122,122);
           <number>15</number>
          </property>
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="login_btn">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -255,6 +327,8 @@ background-color:rgb(122,122,122);
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../icon/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
