@@ -2,12 +2,17 @@ import sys, os
 from PyQt5.QtWidgets import QApplication,QWidget
 from PyQt5.QtCore import Qt,QCoreApplication
 from PyQt5 import uic
+import pandas as pd
+import requests
+
 BASE_DIR=os.path.dirname(os.path.abspath(__file__))
+SERVER_BASE='http://127.0.0.1:5000/api/'
 
 class LoginWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         uic.loadUi(BASE_DIR+"\\ui_resource\\login.ui", self)
+        self.init_ui()
         self.setWindowFlag(Qt.FramelessWindowHint)
         
     def init_ui(self):
@@ -16,7 +21,14 @@ class LoginWidget(QWidget):
         self.login_btn.clicked.connect(self.login)
 
     def login(self):
-        pass
+        id=self.id_line.text()
+        password=self.pass_line.text()
+        datas={'id':id, 'password':password}
+        response=requests.post(SERVER_BASE+'login',data=datas)
+        response=response.json()
+        userId=pd.read_json(response)
+        print(userId)
+
     
 if __name__=="__main__":
     app=QApplication(sys.argv)

@@ -233,7 +233,7 @@ background-color:rgb(122,122,122);
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="id_line">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -243,7 +243,7 @@ background-color:rgb(122,122,122);
              </rect>
             </property>
            </widget>
-           <widget class="QLineEdit" name="lineEdit_2">
+           <widget class="QLineEdit" name="pass_line">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -251,6 +251,9 @@ background-color:rgb(122,122,122);
               <width>200</width>
               <height>30</height>
              </rect>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
             </property>
            </widget>
           </widget>
@@ -287,13 +290,13 @@ background-color:rgb(122,122,122);
            <property name="minimumSize">
             <size>
              <width>250</width>
-             <height>50</height>
+             <height>80</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>250</width>
-             <height>50</height>
+             <height>80</height>
             </size>
            </property>
            <property name="font">
