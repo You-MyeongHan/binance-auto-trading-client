@@ -1,9 +1,10 @@
 import sys, os
-from PyQt5.QtWidgets import QApplication,QWidget
+from PyQt5.QtWidgets import QApplication,QWidget,QStackedWidget
 from PyQt5.QtCore import Qt,QCoreApplication
 from PyQt5 import uic
 import pandas as pd
 import requests
+from main_window import *
 
 BASE_DIR=os.path.dirname(os.path.abspath(__file__))
 SERVER_BASE='http://127.0.0.1:5000/api/'
@@ -26,8 +27,18 @@ class LoginWidget(QWidget):
         datas={'id':id, 'password':password}
         response=requests.post(SERVER_BASE+'login',data=datas)
         response=response.json()
-        userId=pd.read_json(response)
-        print(userId)
+        # userId=pd.read_json(response)
+        self.close()
+        
+        app = QApplication(sys.argv)
+        # widget = QStackedWidget()
+        mw=MainWindow()
+        mw.show()
+        exit(app.exec_())
+        # widget.addWidget(mw)
+        # widget.show()
+        # app.exec_()
+        
 
     
 if __name__=="__main__":
