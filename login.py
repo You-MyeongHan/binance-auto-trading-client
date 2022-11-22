@@ -30,16 +30,8 @@ class LoginWidget(QWidget):
         # userId=pd.read_json(response)
         self.close()
         
-        app = QApplication(sys.argv)
-        # widget = QStackedWidget()
         mw=MainWindow()
         mw.show()
-        exit(app.exec_())
-        # widget.addWidget(mw)
-        # widget.show()
-        # app.exec_()
-        
-
     
 if __name__=="__main__":
     app=QApplication(sys.argv)
